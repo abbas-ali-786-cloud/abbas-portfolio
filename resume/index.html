@@ -1,0 +1,2884 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lamp Login + OTP</title>
+
+    <style>
+        /* =========================================================
+   RESET
+========================================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            overflow: hidden;
+            background: #030403;
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+
+        /* =========================================================
+   VARIABLES
+========================================================= */
+
+        :root {
+            --yellow: #ffd600;
+            --yellow-soft: #ffe96a;
+            --dark: #030403;
+            --card: rgba(48, 48, 40, .80);
+        }
+
+
+        /* =========================================================
+   MAIN SCENE
+========================================================= */
+
+        .scene {
+
+            position: relative;
+
+            width: 100vw;
+            height: 100vh;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(circle at 48% 50%,
+                    #11130e 0%,
+                    #070806 38%,
+                    #020302 72%,
+                    #000 100%);
+
+        }
+
+
+        /* =========================================================
+   VIGNETTE
+========================================================= */
+
+        .scene::after {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            z-index: 90;
+
+            background:
+                radial-gradient(ellipse at center,
+                    transparent 20%,
+                    rgba(0, 0, 0, .35) 60%,
+                    rgba(0, 0, 0, .9) 100%);
+
+        }
+
+
+        /* =========================================================
+   LAMP AREA
+========================================================= */
+
+        .lampArea {
+
+            position: absolute;
+
+            left: 20%;
+
+            top: 50%;
+
+            width: 380px;
+
+            height: 600px;
+
+            transform:
+                translateY(-50%);
+
+            z-index: 20;
+
+            transition:
+                transform 1s ease;
+
+        }
+
+
+        /* =========================================================
+   LAMP
+========================================================= */
+
+        .lamp {
+
+            position: absolute;
+
+            width: 330px;
+
+            height: 570px;
+
+            left: 50%;
+
+            top: 0;
+
+            transform:
+                translateX(-50%);
+
+        }
+
+
+        /* =========================================================
+   SHADE
+========================================================= */
+
+        .shade {
+
+            position: absolute;
+
+            top: 43px;
+
+            left: 50%;
+
+            width: 150px;
+
+            height: 62px;
+
+            transform:
+                translateX(-50%);
+
+            border-radius:
+                90px 90px 13px 13px;
+
+            background:
+                linear-gradient(#040504,
+                    #11120e);
+
+            border:
+                2px solid #171813;
+
+            box-shadow:
+                0 5px 12px rgba(0, 0, 0, .8);
+
+            z-index: 10;
+
+        }
+
+
+        /* =========================================================
+   BULB
+========================================================= */
+
+        .bulb {
+
+            position: absolute;
+
+            left: 50%;
+
+            top: 93px;
+
+            width: 110px;
+
+            height: 19px;
+
+            transform:
+                translateX(-50%);
+
+            border-radius: 50%;
+
+            background: #fff6a9;
+
+            opacity: .03;
+
+            box-shadow: none;
+
+            transition:
+                opacity .7s ease,
+                box-shadow .8s ease;
+
+            z-index: 9;
+
+        }
+
+
+        /* =========================================================
+   LIGHT BEAM
+========================================================= */
+
+        .beam {
+
+            position: absolute;
+
+            top: 99px;
+
+            left: 50%;
+
+            width: 0;
+
+            height: 0;
+
+            transform:
+                translateX(-50%) scaleY(.02);
+
+            transform-origin: top center;
+
+            border-left:
+                175px solid transparent;
+
+            border-right:
+                175px solid transparent;
+
+            border-top:
+                400px solid rgba(255, 215, 50, 0);
+
+            opacity: 0;
+
+            transition:
+                opacity .8s ease,
+                transform 1s cubic-bezier(.16, 1, .3, 1),
+                border-top-color .8s ease;
+
+            z-index: 3;
+
+        }
+
+
+        /* =========================================================
+   BIG GLOW
+========================================================= */
+
+        .lampGlow {
+
+            position: absolute;
+
+            left: 50%;
+
+            top: 95px;
+
+            width: 430px;
+
+            height: 460px;
+
+            transform:
+                translateX(-50%) scale(.3);
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(ellipse,
+                    rgba(255, 220, 60, .38),
+                    rgba(255, 215, 40, .16) 34%,
+                    rgba(255, 205, 20, .05) 58%,
+                    transparent 75%);
+
+            filter: blur(25px);
+
+            opacity: 0;
+
+            transition:
+                opacity 1s ease,
+                transform 1.2s cubic-bezier(.16, 1, .3, 1);
+
+            z-index: 1;
+
+        }
+
+
+        /* =========================================================
+   POLE
+========================================================= */
+
+        .pole {
+
+            position: absolute;
+
+            top: 95px;
+
+            left: 50%;
+
+            width: 5px;
+
+            height: 355px;
+
+            transform:
+                translateX(-50%);
+
+            background:
+                linear-gradient(to right,
+                    #030403,
+                    #1b1c15,
+                    #030403);
+
+            z-index: 7;
+
+        }
+
+
+        /* =========================================================
+   BASE
+========================================================= */
+
+        .base {
+
+            position: absolute;
+
+            bottom: 69px;
+
+            left: 50%;
+
+            width: 130px;
+
+            height: 16px;
+
+            transform:
+                translateX(-50%);
+
+            border-radius: 30px;
+
+            background:
+                linear-gradient(#27281f,
+                    #070806);
+
+            box-shadow:
+                0 7px 12px rgba(0, 0, 0, .9);
+
+            z-index: 8;
+
+        }
+
+
+        /* =========================================================
+   PULL CORD
+========================================================= */
+
+        .pullCord {
+
+            position: absolute;
+
+            left: 72%;
+
+            top: 95px;
+
+            width: 30px;
+
+            height: 155px;
+
+            cursor: grab;
+
+            touch-action: none;
+
+            z-index: 40;
+
+        }
+
+
+        .cordLine {
+
+            position: absolute;
+
+            left: 13px;
+
+            top: 0;
+
+            width: 3px;
+
+            height: 92px;
+
+            background:
+                linear-gradient(to right,
+                    #070806,
+                    #25261d,
+                    #070806);
+
+        }
+
+
+        .cordHandle {
+
+            position: absolute;
+
+            left: 7px;
+
+            top: 85px;
+
+            width: 15px;
+
+            height: 28px;
+
+            border-radius: 8px;
+
+            background:
+                linear-gradient(#fff073,
+                    #c79c00);
+
+            box-shadow:
+                0 0 7px rgba(255, 215, 0, .25);
+
+            transition:
+                box-shadow .4s ease;
+
+        }
+
+
+        /* =========================================================
+   PULL HINT
+========================================================= */
+
+        .pullHint {
+
+            position: absolute;
+
+            top: 238px;
+
+            left: 50%;
+
+            transform:
+                translateX(-50%);
+
+            white-space: nowrap;
+
+            color: #686860;
+
+            font-size: 11px;
+
+            letter-spacing: 1.5px;
+
+            animation:
+                hintPulse 2s ease-in-out infinite;
+
+        }
+
+
+        @keyframes hintPulse {
+
+            0%,
+            100% {
+                opacity: .25;
+            }
+
+            50% {
+                opacity: .8;
+            }
+
+        }
+
+
+        /* =========================================================
+   LAMP ON
+========================================================= */
+
+        .scene.lampOn .bulb {
+
+            opacity: 1;
+
+            box-shadow:
+                0 0 15px var(--yellow),
+                0 0 40px var(--yellow),
+                0 0 85px rgba(255, 215, 0, .8),
+                0 0 140px rgba(255, 215, 0, .4);
+
+        }
+
+
+        .scene.lampOn .beam {
+
+            opacity: 1;
+
+            transform:
+                translateX(-50%) scaleY(1);
+
+            border-top-color:
+                rgba(255, 216, 65, .25);
+
+        }
+
+
+        .scene.lampOn .lampGlow {
+
+            opacity: 1;
+
+            transform:
+                translateX(-50%) scale(1.1);
+
+        }
+
+
+        .scene.lampOn .cordHandle {
+
+            box-shadow:
+                0 0 12px var(--yellow),
+                0 0 28px rgba(255, 215, 0, .6);
+
+        }
+
+
+        /* =========================================================
+   PARTICLES
+========================================================= */
+
+        .particles {
+
+            position: absolute;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            opacity: 0;
+
+            transition:
+                opacity 1s ease;
+
+            z-index: 18;
+
+        }
+
+
+        .scene.lampOn .particles {
+            opacity: 1;
+        }
+
+
+        .particle {
+
+            position: absolute;
+
+            width: 5px;
+
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: #ffe500;
+
+            box-shadow:
+                0 0 8px #ffe500,
+                0 0 20px #ffe500;
+
+            animation:
+                floatParticle 4s ease-in-out infinite;
+
+        }
+
+
+        .particle:nth-child(1) {
+            left: 31%;
+            top: 42%;
+            animation-delay: .2s;
+        }
+
+        .particle:nth-child(2) {
+            left: 39%;
+            top: 63%;
+            animation-delay: 1.2s;
+        }
+
+        .particle:nth-child(3) {
+            left: 46%;
+            top: 49%;
+            animation-delay: 2s;
+        }
+
+        .particle:nth-child(4) {
+            left: 58%;
+            top: 30%;
+            animation-delay: .8s;
+        }
+
+        .particle:nth-child(5) {
+            left: 69%;
+            top: 51%;
+            animation-delay: 2.5s;
+        }
+
+        .particle:nth-child(6) {
+            left: 80%;
+            top: 69%;
+            animation-delay: 1.6s;
+        }
+
+        .particle:nth-child(7) {
+            left: 90%;
+            top: 43%;
+            animation-delay: 3s;
+        }
+
+        .particle:nth-child(8) {
+            left: 65%;
+            top: 78%;
+            animation-delay: 3.5s;
+        }
+
+
+        @keyframes floatParticle {
+
+            0% {
+                opacity: 0;
+                transform:
+                    translateY(20px) scale(.5);
+            }
+
+            25% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 1;
+                transform:
+                    translateY(-20px) translateX(13px) scale(1.2);
+            }
+
+            80% {
+                opacity: .4;
+            }
+
+            100% {
+                opacity: 0;
+                transform:
+                    translateY(-48px) translateX(-10px) scale(.4);
+            }
+
+        }
+
+
+        /* =========================================================
+   COMMON PANEL
+========================================================= */
+
+        .panel {
+
+            position: absolute;
+
+            width: 450px;
+
+            right: 8%;
+
+            top: 50%;
+
+            padding: 40px;
+
+            border-radius: 23px;
+
+            background:
+                linear-gradient(135deg,
+                    rgba(55, 54, 45, .86),
+                    rgba(31, 32, 27, .80));
+
+            border:
+                1px solid rgba(255, 255, 255, .12);
+
+            backdrop-filter:
+                blur(23px);
+
+            -webkit-backdrop-filter:
+                blur(23px);
+
+            box-shadow:
+                0 30px 90px rgba(0, 0, 0, .7),
+                inset 0 0 30px rgba(255, 255, 255, .025);
+
+            z-index: 60;
+
+        }
+
+
+        /* =========================================================
+   LOGIN PANEL
+========================================================= */
+
+        .loginPanel {
+
+            transform:
+                translateY(-50%) translateX(140%);
+
+            opacity: 0;
+
+            pointer-events: none;
+
+        }
+
+
+        .scene.lampOn .loginPanel {
+
+            animation:
+                loginIn 1s cubic-bezier(.16, 1, .3, 1) .35s forwards;
+
+            pointer-events: auto;
+
+        }
+
+
+        .scene.lampOff .loginPanel {
+
+            animation:
+                loginOut .65s cubic-bezier(.7, 0, .84, 0) forwards;
+
+            pointer-events: none;
+
+        }
+
+
+        @keyframes loginIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(-50%) translateX(140%);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(-50%) translateX(0);
+
+            }
+
+        }
+
+
+        @keyframes loginOut {
+
+            from {
+
+                opacity: 1;
+
+                transform:
+                    translateY(-50%) translateX(0);
+
+            }
+
+            to {
+
+                opacity: 0;
+
+                transform:
+                    translateY(-50%) translateX(140%);
+
+            }
+
+        }
+
+
+        /* =========================================================
+   OTP PANEL
+========================================================= */
+
+        .otpPanel {
+
+            transform:
+                translateY(-50%) translateX(140%);
+
+            opacity: 0;
+
+            pointer-events: none;
+
+        }
+
+
+        .scene.showOTP .loginPanel {
+            display: none;
+        }
+
+
+        .scene.showOTP .otpPanel {
+
+            animation:
+                otpIn 1s cubic-bezier(.16, 1, .3, 1) forwards;
+
+            pointer-events: auto;
+
+        }
+
+
+        .scene.lampOff .otpPanel {
+
+            animation:
+                otpOut .65s cubic-bezier(.7, 0, .84, 0) forwards;
+
+            pointer-events: none;
+
+        }
+
+
+        @keyframes otpIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(-50%) translateX(140%);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(-50%) translateX(0);
+
+            }
+
+        }
+
+
+        @keyframes otpOut {
+
+            from {
+
+                opacity: 1;
+
+                transform:
+                    translateY(-50%) translateX(0);
+
+            }
+
+            to {
+
+                opacity: 0;
+
+                transform:
+                    translateY(-50%) translateX(140%);
+
+            }
+
+        }
+
+
+        /* =========================================================
+   TITLE
+========================================================= */
+
+        .title {
+
+            color: #fff;
+
+            text-align: center;
+
+            font-size: 38px;
+
+            font-weight: 800;
+
+            letter-spacing: -1px;
+
+        }
+
+
+        .subtitle {
+
+            color: #aaa99f;
+
+            text-align: center;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+
+            margin-top: 9px;
+
+            margin-bottom: 27px;
+
+        }
+
+
+        /* =========================================================
+   INPUT
+========================================================= */
+
+        .inputBox {
+
+            width: 100%;
+
+            height: 60px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 0 16px;
+
+            margin-bottom: 14px;
+
+            border:
+                1px solid rgba(255, 255, 255, .12);
+
+            border-radius: 15px;
+
+            background:
+                rgba(3, 4, 3, .72);
+
+            transition: .25s;
+
+        }
+
+
+        .inputBox:focus-within {
+
+            border-color:
+                var(--yellow);
+
+            box-shadow:
+                0 0 0 2px rgba(255, 214, 0, .06),
+                0 0 20px rgba(255, 214, 0, .12);
+
+            transform:
+                translateY(-2px);
+
+        }
+
+
+        .inputIcon {
+
+            width: 23px;
+
+            color: #85847b;
+
+            font-size: 18px;
+
+            text-align: center;
+
+        }
+
+
+        .inputBox input {
+
+            width: 100%;
+
+            height: 100%;
+
+            border: 0;
+
+            outline: 0;
+
+            background: transparent;
+
+            color: white;
+
+            font-size: 14px;
+
+        }
+
+
+        .inputBox input::placeholder {
+            color: #74736c;
+        }
+
+
+        .eye {
+
+            color: #77766e;
+
+            cursor: pointer;
+
+        }
+
+
+        /* =========================================================
+   BUTTON
+========================================================= */
+
+        .mainBtn {
+
+            width: 100%;
+
+            height: 60px;
+
+            border:
+                2px solid var(--yellow);
+
+            border-radius: 15px;
+
+            background:
+                var(--yellow);
+
+            color: #10100b;
+
+            font-size: 15px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform .2s,
+                box-shadow .2s;
+
+        }
+
+
+        .mainBtn:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 0 28px rgba(255, 214, 0, .35);
+
+        }
+
+
+        .mainBtn:active {
+
+            transform:
+                scale(.94);
+
+        }
+
+
+        /* =========================================================
+   DIVIDER
+========================================================= */
+
+        .divider {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin: 27px 0;
+
+            color: #85847c;
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+        }
+
+
+        .divider::before,
+        .divider::after {
+
+            content: "";
+
+            height: 1px;
+
+            flex: 1;
+
+            background:
+                rgba(255, 255, 255, .1);
+
+        }
+
+
+        /* =========================================================
+   SOCIAL
+========================================================= */
+
+        .socials {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 13px;
+
+        }
+
+
+        .socialBtn {
+
+            height: 57px;
+
+            border:
+                1px solid rgba(255, 255, 255, .12);
+
+            border-radius: 14px;
+
+            background:
+                rgba(255, 255, 255, .055);
+
+            color: #eee;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: .25s;
+
+        }
+
+
+        .socialBtn:hover {
+
+            border-color:
+                var(--yellow);
+
+            transform:
+                translateY(-3px);
+
+        }
+
+
+        .socialBtn:active {
+            transform: scale(.94);
+        }
+
+
+        /* =========================================================
+   ERROR
+========================================================= */
+
+        .error {
+
+            display: none;
+
+            color: #ff8787;
+
+            font-size: 12px;
+
+            text-align: center;
+
+            margin:
+                -3px 0 12px;
+
+        }
+
+
+        .error.show {
+            display: block;
+        }
+
+
+        /* =========================================================
+   OTP BOXES
+========================================================= */
+
+        .otpBoxes {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(6, 1fr);
+
+            gap: 8px;
+
+            margin-bottom: 22px;
+
+        }
+
+
+        .otpInput {
+
+            width: 100%;
+
+            aspect-ratio: 1/1.12;
+
+            border:
+                1px solid rgba(255, 255, 255, .15);
+
+            border-radius: 12px;
+
+            background:
+                rgba(2, 3, 2, .75);
+
+            color: #fff;
+
+            outline: none;
+
+            text-align: center;
+
+            font-size: 20px;
+
+            font-weight: 800;
+
+            transition: .2s;
+
+        }
+
+
+        .otpInput:focus {
+
+            border-color:
+                var(--yellow);
+
+            box-shadow:
+                0 0 18px rgba(255, 214, 0, .15);
+
+            transform:
+                translateY(-2px);
+
+        }
+
+
+        /* =========================================================
+   OTP TIMER
+========================================================= */
+
+        .otpInfo {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+
+            font-size: 12px;
+
+            color: #85847c;
+
+        }
+
+
+        .timer {
+
+            color: var(--yellow);
+
+            font-weight: 800;
+
+        }
+
+
+        .resend {
+
+            border: 0;
+
+            background: transparent;
+
+            color: #77766e;
+
+            cursor: not-allowed;
+
+            font-size: 12px;
+
+        }
+
+
+        .resend.active {
+
+            color: var(--yellow);
+
+            cursor: pointer;
+
+        }
+
+
+        /* =========================================================
+   OTP STATUS
+========================================================= */
+
+        .otpStatus {
+
+            min-height: 18px;
+
+            text-align: center;
+
+            font-size: 12px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .otpStatus.error {
+            color: #ff8585;
+        }
+
+
+        .otpStatus.success {
+            color: #dfff55;
+        }
+
+
+        /* =========================================================
+   SUCCESS
+========================================================= */
+
+        .successBox {
+
+            display: none;
+
+            text-align: center;
+
+        }
+
+
+        .successBox.show {
+
+            display: block;
+
+            animation:
+                successIn .5s ease forwards;
+
+        }
+
+
+        @keyframes successIn {
+
+            from {
+                opacity: 0;
+                transform: scale(.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+        }
+
+
+        .successCircle {
+
+            width: 82px;
+
+            height: 82px;
+
+            margin:
+                0 auto 22px;
+
+            border:
+                2px solid var(--yellow);
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            color: var(--yellow);
+
+            font-size: 38px;
+
+            box-shadow:
+                0 0 30px rgba(255, 214, 0, .3);
+
+        }
+
+
+        .successBox h2 {
+
+            color: white;
+
+            font-size: 28px;
+
+        }
+
+
+        .successBox p {
+
+            color: #999;
+
+            font-size: 13px;
+
+            margin-top: 8px;
+
+        }
+
+
+        /* =========================================================
+   MOBILE
+========================================================= */
+
+        @media(max-width:900px) {
+
+            .lampArea {
+
+                left: 50%;
+
+                top: 35%;
+
+                transform:
+                    translate(-50%, -50%) scale(.78);
+
+            }
+
+
+            .panel {
+
+                width:
+                    min(450px, 92vw);
+
+                right: 4%;
+
+                top: auto;
+
+                bottom: 4%;
+
+                padding:
+                    27px 20px;
+
+            }
+
+
+            .loginPanel,
+            .otpPanel {
+
+                transform:
+                    translateX(140%);
+
+            }
+
+
+            .scene.lampOn .loginPanel {
+
+                animation:
+                    mobilePanelIn 1s cubic-bezier(.16, 1, .3, 1) .25s forwards;
+
+            }
+
+
+            .scene.lampOff .loginPanel {
+
+                animation:
+                    mobilePanelOut .6s ease forwards;
+
+            }
+
+
+            .scene.showOTP .otpPanel {
+
+                animation:
+                    mobilePanelIn 1s cubic-bezier(.16, 1, .3, 1) forwards;
+
+            }
+
+
+            .scene.lampOff .otpPanel {
+
+                animation:
+                    mobilePanelOut .6s ease forwards;
+
+            }
+
+
+            @keyframes mobilePanelIn {
+
+                from {
+
+                    opacity: 0;
+
+                    transform:
+                        translateX(140%);
+
+                }
+
+                to {
+
+                    opacity: 1;
+
+                    transform:
+                        translateX(0);
+
+                }
+
+            }
+
+
+            @keyframes mobilePanelOut {
+
+                from {
+
+                    opacity: 1;
+
+                    transform:
+                        translateX(0);
+
+                }
+
+                to {
+
+                    opacity: 0;
+
+                    transform:
+                        translateX(140%);
+
+                }
+
+            }
+
+
+            .title {
+                font-size: 30px;
+            }
+
+        }
+
+
+        @media(max-width:500px) {
+
+            .lampArea {
+
+                top: 31%;
+
+                transform:
+                    translate(-50%, -50%) scale(.68);
+
+            }
+
+
+            .panel {
+
+                width: 92%;
+
+                right: 4%;
+
+                bottom: 2.5%;
+
+                padding:
+                    23px 16px;
+
+            }
+
+
+            .title {
+                font-size: 27px;
+            }
+
+
+            .subtitle {
+                font-size: 11px;
+            }
+
+
+            .inputBox,
+            .mainBtn {
+                height: 55px;
+            }
+
+
+            .socials {
+                gap: 8px;
+            }
+
+
+            .socialBtn {
+                height: 52px;
+                font-size: 12px;
+            }
+
+
+            .otpBoxes {
+                gap: 5px;
+            }
+
+
+            .otpInput {
+                border-radius: 9px;
+                font-size: 18px;
+            }
+
+        }
+    </style>
+</head>
+
+
+<body>
+
+
+    <div class="scene" id="scene">
+
+
+        <!-- =====================================================
+         LAMP
+    ====================================================== -->
+
+        <div class="lampArea">
+
+            <div class="lamp">
+
+                <div class="lampGlow"></div>
+
+                <div class="beam"></div>
+
+                <div class="shade"></div>
+
+                <div class="bulb"></div>
+
+                <div class="pole"></div>
+
+                <div class="base"></div>
+
+
+                <!-- PULL CORD -->
+
+                <div class="pullCord" id="pullCord">
+
+                    <div class="cordLine" id="cordLine"></div>
+
+                    <div class="cordHandle" id="cordHandle"></div>
+
+                </div>
+
+
+                <div class="pullHint">
+                    PULL THE CORD
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+         PARTICLES
+    ====================================================== -->
+
+        <div class="particles">
+
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+
+        </div>
+
+
+        <!-- =====================================================
+         LOGIN PANEL
+    ====================================================== -->
+
+        <div class="panel loginPanel" id="loginPanel">
+
+            <div id="loginContent">
+
+                <h1 class="title">
+                    Welcome Back
+                </h1>
+
+                <p class="subtitle">
+                    Enter your details to access your account
+                </p>
+
+
+                <!-- USERNAME -->
+
+                <div class="inputBox">
+
+                    <span class="inputIcon">
+                        ♙
+                    </span>
+
+                    <input id="username" type="text" placeholder="Username" autocomplete="username">
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="inputBox">
+
+                    <span class="inputIcon">
+                        ✉
+                    </span>
+
+                    <input id="email" type="email" placeholder="Email Address" autocomplete="email">
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="inputBox">
+
+                    <span class="inputIcon">
+                        🔒
+                    </span>
+
+                    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+
+                    <span class="eye" id="eye" onclick="togglePassword()">
+                        👁
+                    </span>
+
+                </div>
+
+
+                <div class="error" id="loginError">
+                    Please fill all fields.
+                </div>
+
+
+                <button class="mainBtn" id="continueBtn" onclick="continueToOTP()">
+                    Continue
+                </button>
+
+
+                <div class="divider">
+                    OR CONTINUE WITH
+                </div>
+
+
+                <div class="socials">
+
+                    <button class="socialBtn" onclick="socialLogin('Google')">
+                        <b style="color:#4285f4;font-size:18px;">
+                            G
+                        </b>
+                        &nbsp; Google
+                    </button>
+
+
+                    <button class="socialBtn" onclick="socialLogin('GitHub')">
+                        <b style="font-size:17px;">
+                            ●
+                        </b>
+                        &nbsp; GitHub
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+         OTP PANEL
+    ====================================================== -->
+
+        <div class="panel otpPanel" id="otpPanel">
+
+            <!-- OTP CONTENT -->
+
+            <div id="otpContent">
+
+                <h1 class="title">
+                    Verify Account
+                </h1>
+
+                <p class="subtitle">
+                    Enter the 6-digit OTP sent to
+                    <br>
+                    <strong id="otpEmail">
+                        your email
+                    </strong>
+                </p>
+
+
+                <!-- OTP INPUTS -->
+
+                <div class="otpBoxes">
+
+                    <input class="otpInput" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+
+                    <input class="otpInput" maxlength="1" inputmode="numeric">
+
+                    <input class="otpInput" maxlength="1" inputmode="numeric">
+
+                    <input class="otpInput" maxlength="1" inputmode="numeric">
+
+                    <input class="otpInput" maxlength="1" inputmode="numeric">
+
+                    <input class="otpInput" maxlength="1" inputmode="numeric">
+
+                </div>
+
+
+                <!-- TIMER -->
+
+                <div class="otpInfo">
+
+                    <span>
+                        Code expires in
+                        <span class="timer" id="timer">
+                            01:00
+                        </span>
+                    </span>
+
+
+                    <button class="resend" id="resendBtn" onclick="resendOTP()">
+                        Resend OTP
+                    </button>
+
+                </div>
+
+
+                <div class="otpStatus" id="otpStatus"></div>
+
+
+                <button class="mainBtn" id="verifyBtn" onclick="verifyOTP()">
+                    Verify OTP
+                </button>
+
+            </div>
+
+
+            <!-- SUCCESS -->
+
+            <div class="successBox" id="successBox">
+
+                <div class="successCircle">
+                    ✓
+                </div>
+
+                <h2>
+                    Verified!
+                </h2>
+
+                <p id="successText">
+                    Your account has been verified successfully.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        /* =========================================================
+           VARIABLES
+        ========================================================= */
+
+        const scene =
+            document.getElementById("scene");
+
+        const pullCord =
+            document.getElementById("pullCord");
+
+        const cordHandle =
+            document.getElementById("cordHandle");
+
+        const cordLine =
+            document.getElementById("cordLine");
+
+
+        let lampOn = false;
+
+        let pulling = false;
+
+        let startY = 0;
+
+        let currentPull = 0;
+
+        let generatedOTP = "";
+
+        let timerSeconds = 60;
+
+        let timerInterval = null;
+
+
+        /* =========================================================
+           PULL CORD
+        ========================================================= */
+
+        pullCord.addEventListener(
+            "pointerdown",
+            function (e) {
+
+                pulling = true;
+
+                startY = e.clientY;
+
+                pullCord.setPointerCapture(
+                    e.pointerId
+                );
+
+            }
+        );
+
+
+        pullCord.addEventListener(
+            "pointermove",
+            function (e) {
+
+                if (!pulling) {
+                    return;
+                }
+
+
+                let distance =
+                    e.clientY - startY;
+
+
+                if (distance < 0) {
+                    distance = 0;
+                }
+
+
+                if (distance > 65) {
+                    distance = 65;
+                }
+
+
+                currentPull =
+                    distance;
+
+
+                cordHandle.style.transform =
+                    `translateY(${distance}px)`;
+
+
+                cordLine.style.height =
+                    `${92 + distance}px`;
+
+
+                /*
+                   Pull threshold reached
+                */
+
+                if (distance >= 42) {
+
+                    pulling = false;
+
+                    toggleLamp();
+
+                }
+
+            }
+        );
+
+
+        pullCord.addEventListener(
+            "pointerup",
+            function () {
+
+                if (!pulling) {
+                    return;
+                }
+
+
+                pulling = false;
+
+
+                /*
+                   Snap back
+                */
+
+                cordHandle.style.transform =
+                    "translateY(0)";
+
+                cordLine.style.height =
+                    "92px";
+
+            }
+        );
+
+
+        pullCord.addEventListener(
+            "pointercancel",
+            function () {
+
+                pulling = false;
+
+                cordHandle.style.transform =
+                    "translateY(0)";
+
+                cordLine.style.height =
+                    "92px";
+
+            }
+        );
+
+
+        /* =========================================================
+           TOGGLE LAMP
+        ========================================================= */
+
+        function toggleLamp() {
+
+            /*
+               Pull animation
+            */
+
+            cordHandle.animate(
+
+                [
+                    {
+                        transform:
+                            "translateY(42px)"
+                    },
+
+                    {
+                        transform:
+                            "translateY(52px)"
+                    },
+
+                    {
+                        transform:
+                            "translateY(42px)"
+                    }
+
+                ],
+
+                {
+                    duration: 300
+                }
+
+            );
+
+
+            if (!lampOn) {
+
+                turnLampOn();
+
+            }
+
+            else {
+
+                turnLampOff();
+
+            }
+
+        }
+
+
+        /* =========================================================
+           TURN LAMP ON
+        ========================================================= */
+
+        function turnLampOn() {
+
+            lampOn = true;
+
+
+            scene.classList.remove(
+                "lampOff"
+            );
+
+
+            scene.classList.add(
+                "lampOn"
+            );
+
+
+            /*
+               If OTP page was already open,
+               keep OTP page visible.
+            */
+
+        }
+
+
+        /* =========================================================
+           TURN LAMP OFF
+        ========================================================= */
+
+        function turnLampOff() {
+
+            lampOn = false;
+
+
+            scene.classList.remove(
+                "lampOn"
+            );
+
+
+            scene.classList.add(
+                "lampOff"
+            );
+
+
+            /*
+               If lamp is switched off,
+               login/OTP disappears.
+            */
+
+        }
+
+
+        /* =========================================================
+           PASSWORD
+        ========================================================= */
+
+        function togglePassword() {
+
+            const password =
+                document.getElementById(
+                    "password"
+                );
+
+            const eye =
+                document.getElementById(
+                    "eye"
+                );
+
+
+            if (password.type === "password") {
+
+                password.type =
+                    "text";
+
+                eye.textContent =
+                    "🙈";
+
+            }
+
+            else {
+
+                password.type =
+                    "password";
+
+                eye.textContent =
+                    "👁";
+
+            }
+
+        }
+
+
+        /* =========================================================
+           CONTINUE TO OTP
+        ========================================================= */
+
+        function continueToOTP() {
+
+            const username =
+                document
+                    .getElementById(
+                        "username"
+                    )
+                    .value
+                    .trim();
+
+
+            const email =
+                document
+                    .getElementById(
+                        "email"
+                    )
+                    .value
+                    .trim();
+
+
+            const password =
+                document
+                    .getElementById(
+                        "password"
+                    )
+                    .value;
+
+
+            const error =
+                document.getElementById(
+                    "loginError"
+                );
+
+
+            const button =
+                document.getElementById(
+                    "continueBtn"
+                );
+
+
+            /*
+               Validation
+            */
+
+            if (
+                !username ||
+                !email ||
+                !password
+            ) {
+
+                error.textContent =
+                    "Please fill Username, Email and Password.";
+
+                error.classList.add(
+                    "show"
+                );
+
+
+                shake(button);
+
+                return;
+
+            }
+
+
+            /*
+               Email validation
+            */
+
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+            if (
+                !emailPattern.test(email)
+            ) {
+
+                error.textContent =
+                    "Please enter a valid email address.";
+
+                error.classList.add(
+                    "show"
+                );
+
+
+                shake(button);
+
+                return;
+
+            }
+
+
+            error.classList.remove(
+                "show"
+            );
+
+
+            /*
+               Button animation
+            */
+
+            button.animate(
+
+                [
+                    {
+                        transform: "scale(1)"
+                    },
+
+                    {
+                        transform: "scale(.94)"
+                    },
+
+                    {
+                        transform: "scale(1)"
+                    }
+
+                ],
+
+                {
+                    duration: 350
+                }
+
+            );
+
+
+            button.textContent =
+                "Sending OTP...";
+
+
+            button.disabled =
+                true;
+
+
+            /*
+               Generate demo OTP
+            */
+
+            generatedOTP =
+                Math.floor(
+                    100000 +
+                    Math.random() * 900000
+                ).toString();
+
+
+            console.log(
+                "DEMO OTP:",
+                generatedOTP
+            );
+
+
+            /*
+               Show email
+            */
+
+            document.getElementById(
+                "otpEmail"
+            ).textContent =
+                email;
+
+
+            /*
+               Wait then switch page
+            */
+
+            setTimeout(function () {
+
+                scene.classList.add(
+                    "showOTP"
+                );
+
+
+                /*
+                   For demo:
+                   show OTP in browser console.
+                */
+
+                console.log(
+                    "%c DEMO OTP: " +
+                    generatedOTP,
+                    "color:#ffd600;font-size:20px;font-weight:bold;"
+                );
+
+
+                startTimer();
+
+
+                /*
+                   Automatically focus first OTP
+                */
+
+                setTimeout(function () {
+
+                    document
+                        .querySelector(
+                            ".otpInput"
+                        )
+                        .focus();
+
+                }, 700);
+
+
+            }, 650);
+
+        }
+
+
+        /* =========================================================
+           SHAKE
+        ========================================================= */
+
+        function shake(element) {
+
+            element.animate(
+
+                [
+
+                    {
+                        transform:
+                            "translateX(0)"
+                    },
+
+                    {
+                        transform:
+                            "translateX(-8px)"
+                    },
+
+                    {
+                        transform:
+                            "translateX(8px)"
+                    },
+
+                    {
+                        transform:
+                            "translateX(-5px)"
+                    },
+
+                    {
+                        transform:
+                            "translateX(0)"
+                    }
+
+                ],
+
+                {
+                    duration: 400
+                }
+
+            );
+
+        }
+
+
+        /* =========================================================
+           OTP INPUT AUTO MOVE
+        ========================================================= */
+
+        const otpInputs =
+            document.querySelectorAll(
+                ".otpInput"
+            );
+
+
+        otpInputs.forEach(
+            function (input, index) {
+
+                input.addEventListener(
+                    "input",
+                    function () {
+
+                        /*
+                           Only numbers
+                        */
+
+                        this.value =
+                            this.value
+                                .replace(
+                                    /[^0-9]/g,
+                                    ""
+                                );
+
+
+                        /*
+                           Move forward
+                        */
+
+                        if (
+                            this.value &&
+                            index <
+                            otpInputs.length - 1
+                        ) {
+
+                            otpInputs[
+                                index + 1
+                            ].focus();
+
+                        }
+
+                    }
+                );
+
+
+                input.addEventListener(
+                    "keydown",
+                    function (e) {
+
+                        if (
+                            e.key === "Backspace" &&
+                            !this.value &&
+                            index > 0
+                        ) {
+
+                            otpInputs[
+                                index - 1
+                            ].focus();
+
+                        }
+
+                    }
+                );
+
+
+                /*
+                   Paste full OTP
+                */
+
+                input.addEventListener(
+                    "paste",
+                    function (e) {
+
+                        e.preventDefault();
+
+
+                        const pasted =
+                            e.clipboardData
+                                .getData("text")
+                                .replace(
+                                    /\D/g,
+                                    ""
+                                )
+                                .slice(
+                                    0,
+                                    6
+                                );
+
+
+                        pasted
+                            .split("")
+                            .forEach(
+                                function (char, i) {
+
+                                    if (
+                                        otpInputs[i]
+                                    ) {
+
+                                        otpInputs[i]
+                                            .value =
+                                            char;
+
+                                    }
+
+                                }
+                            );
+
+
+                        if (
+                            pasted.length === 6
+                        ) {
+
+                            otpInputs[5].focus();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =========================================================
+           START OTP TIMER
+        ========================================================= */
+
+        function startTimer() {
+
+            clearInterval(
+                timerInterval
+            );
+
+
+            timerSeconds = 60;
+
+
+            updateTimer();
+
+
+            document
+                .getElementById(
+                    "resendBtn"
+                )
+                .classList.remove(
+                    "active"
+                );
+
+
+            timerInterval =
+                setInterval(
+                    function () {
+
+                        timerSeconds--;
+
+
+                        updateTimer();
+
+
+                        if (
+                            timerSeconds <= 0
+                        ) {
+
+                            clearInterval(
+                                timerInterval
+                            );
+
+
+                            document
+                                .getElementById(
+                                    "resendBtn"
+                                )
+                                .classList.add(
+                                    "active"
+                                );
+
+                        }
+
+                    },
+                    1000
+                );
+
+        }
+
+
+        /* =========================================================
+           UPDATE TIMER
+        ========================================================= */
+
+        function updateTimer() {
+
+            const minutes =
+                Math.floor(
+                    timerSeconds / 60
+                );
+
+
+            const seconds =
+                timerSeconds % 60;
+
+
+            document.getElementById(
+                "timer"
+            ).textContent =
+                String(minutes).padStart(
+                    2,
+                    "0"
+                ) +
+                ":" +
+                String(seconds).padStart(
+                    2,
+                    "0"
+                );
+
+        }
+
+
+        /* =========================================================
+           RESEND OTP
+        ========================================================= */
+
+        function resendOTP() {
+
+            const button =
+                document.getElementById(
+                    "resendBtn"
+                );
+
+
+            if (
+                !button.classList.contains(
+                    "active"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+               Generate new demo OTP
+            */
+
+            generatedOTP =
+                Math.floor(
+                    100000 +
+                    Math.random() * 900000
+                ).toString();
+
+
+            console.log(
+                "%c NEW DEMO OTP: " +
+                generatedOTP,
+                "color:#ffd600;font-size:20px;font-weight:bold;"
+            );
+
+
+            /*
+               Clear boxes
+            */
+
+            otpInputs.forEach(
+                function (input) {
+                    input.value = "";
+                }
+            );
+
+
+            otpInputs[0].focus();
+
+
+            /*
+               Status
+            */
+
+            const status =
+                document.getElementById(
+                    "otpStatus"
+                );
+
+
+            status.className =
+                "otpStatus success";
+
+            status.textContent =
+                "A new OTP has been generated.";
+
+
+            startTimer();
+
+        }
+
+
+        /* =========================================================
+           VERIFY OTP
+        ========================================================= */
+
+        function verifyOTP() {
+
+            const enteredOTP =
+                Array.from(
+                    otpInputs
+                )
+                    .map(
+                        input =>
+                            input.value
+                    )
+                    .join("");
+
+
+            const status =
+                document.getElementById(
+                    "otpStatus"
+                );
+
+
+            const button =
+                document.getElementById(
+                    "verifyBtn"
+                );
+
+
+            /*
+               Check length
+            */
+
+            if (
+                enteredOTP.length !== 6
+            ) {
+
+                status.className =
+                    "otpStatus error";
+
+                status.textContent =
+                    "Please enter the complete 6-digit OTP.";
+
+                shake(button);
+
+                return;
+
+            }
+
+
+            /*
+               Demo verification
+            */
+
+            if (
+                enteredOTP !== generatedOTP
+            ) {
+
+                status.className =
+                    "otpStatus error";
+
+                status.textContent =
+                    "Invalid OTP. Please try again.";
+
+                shake(button);
+
+                return;
+
+            }
+
+
+            /*
+               Correct OTP
+            */
+
+            status.className =
+                "otpStatus success";
+
+            status.textContent =
+                "OTP verified successfully.";
+
+            button.textContent =
+                "Verified";
+
+
+            button.disabled =
+                true;
+
+
+            clearInterval(
+                timerInterval
+            );
+
+
+            setTimeout(
+                function () {
+
+                    document
+                        .getElementById(
+                            "otpContent"
+                        )
+                        .style.display =
+                        "none";
+
+
+                    document
+                        .getElementById(
+                            "successBox"
+                        )
+                        .classList.add(
+                            "show"
+                        );
+
+                },
+                700
+            );
+
+        }
+
+
+        /* =========================================================
+           SOCIAL
+        ========================================================= */
+
+        function socialLogin(provider) {
+
+            alert(
+                provider +
+                " OAuth ko real login ke liye backend/OAuth credentials se connect karna hoga."
+            );
+
+        }
+
+
+        /* =========================================================
+           KEYBOARD ENTER
+        ========================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (e) {
+
+                if (
+                    e.key !== "Enter"
+                ) {
+                    return;
+                }
+
+
+                const active =
+                    document.activeElement;
+
+
+                if (
+                    active &&
+                    active.classList.contains(
+                        "otpInput"
+                    )
+                ) {
+
+                    verifyOTP();
+
+                }
+
+                else if (
+                    active &&
+                    active.tagName === "INPUT"
+                ) {
+
+                    continueToOTP();
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
